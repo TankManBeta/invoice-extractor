@@ -1,0 +1,15 @@
+# ---------------------------------------------------------------------------
+# Optional OCR support: needed to read scanned PDFs / invoice images.
+#   pip install -r requirements-ocr.txt
+# ASCII-only on purpose (see requirements.txt).
+#
+# After installing pytesseract you still need the Tesseract engine itself:
+#   https://github.com/UB-Mannheim/tesseract/wiki
+#   During setup, tick the "Chinese (Simplified)" language data.
+#
+# A heavier but more accurate Chinese alternative (run these two instead):
+#   pip install paddleocr paddlepaddle
+# ---------------------------------------------------------------------------
+
+pytesseract>=0.3.10
+pillow>=10.0

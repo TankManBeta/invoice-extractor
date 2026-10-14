@@ -1,0 +1,11 @@
+# ---------------------------------------------------------------------------
+# Everything installable in one go:
+#   pip install -r requirements-full.txt
+# ASCII-only on purpose (see requirements.txt).
+# Heavy extras are intentionally NOT included; install them manually:
+#   pip install PyMuPDF            # faster PDF engine
+#   pip install paddleocr paddlepaddle pillow   # PaddleOCR alternative
+# ---------------------------------------------------------------------------
+
+-r requirements.txt
+-r requirements-ocr.txt

@@ -1,0 +1,22 @@
+# ---------------------------------------------------------------------------
+# Invoice Extractor - required dependencies (core + PDF + Excel export)
+#   pip install -r requirements.txt
+# NOTE: keep this file ASCII-only. pip reads requirement files with the
+#       system locale codec (GBK on Chinese Windows) and fails on UTF-8 text.
+# See requirements-ocr.txt for optional OCR support (scanned invoices/images).
+# ---------------------------------------------------------------------------
+
+# 1) Qt GUI. Pick one: this project supports PySide6 / PyQt6 / PyQt5.
+#    Prefer PySide6. If it fails to install, comment it out and use PyQt6.
+PySide6>=6.5
+
+# 2) PDF text layer. pypdf is pure Python and easiest to install.
+#    Optional faster engine: pip install PyMuPDF  (auto-preferred when present)
+pypdf>=4.0
+
+# 3) Read .xlsx / .xls invoice ledgers (optional but recommended)
+openpyxl>=3.1
+xlrd>=2.0
+
+# 4) Auto-detect text file encoding (optional, improves GBK/UTF-8 guessing)
+charset-normalizer>=3.0

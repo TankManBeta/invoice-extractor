@@ -127,15 +127,27 @@ def main() -> int:
         model.set_selection([0], False)
         check("取消单条勾选", model.checked_count() == len(records) - 1)
 
-        # 3) 字段显示开关
+        # 3) 字段显示开关（含"号码后8位"派生列）
         window.results_panel.field_boxes["code"].setChecked(False)
         check("隐藏字段", "code" not in window.results_panel.visible_fields())
         window.results_panel.field_boxes["code"].setChecked(True)
+        window.results_panel.field_boxes["number_last8"].setChecked(True)
+        process_events(app, 0.2)
+        headers = [
+            model.headerData(c, qt_module.Qt.Orientation.Horizontal)
+            for c in range(model.columnCount())
+        ]
+        check("可显示「号码后8位」列", "号码后8位" in headers, str(headers))
+        last8_column = headers.index("号码后8位")
+        last8_values = [str(model.data(model.index(r, last8_column))) for r in range(model.rowCount())]
+        expected = [r.number_last8 for r in records]
+        check("后8位取值正确", last8_values == expected, f"{last8_values}")
 
         # 4) 复制到剪贴板
         window.copy_records("selected")
         clipboard = QtWidgets.QApplication.clipboard().text()
         check("复制到剪贴板", clipboard.count("\n") >= 1, f"表头={clipboard.splitlines()[:1]}")
+        check("复制内容含「号码后8位」", "号码后8位" in clipboard.splitlines()[0])
 
         # 5) 导出三种格式
         out_dir = tempfile.mkdtemp(prefix="invoice-smoke-")
@@ -149,6 +161,24 @@ def main() -> int:
                 check(f"导出 {ext}", size > 0, f"{size} 字节")
             except Exception as exc:  # noqa: BLE001
                 check(f"导出 {ext}", False, str(exc))
+
+        # 5b) 导出文件里的「号码后8位」列
+        csv_path = os.path.join(out_dir, "发票信息.csv")
+        try:
+            import csv as _csv
+
+            with open(csv_path, encoding="utf-8-sig") as handle:
+                rows = list(_csv.reader(handle))
+            header = rows[0]
+            check("导出含「号码后8位」列", "号码后8位" in header, str(header[:3]))
+            if "号码后8位" in header:
+                index = header.index("号码后8位")
+                number_index = header.index("发票号码")
+                values = [row[index] for row in rows[1 : 1 + len(records)]]
+                expect = [r.number_last8 for r in records]
+                check("导出后8位与号码一致", values == expect, f"{values}")
+        except Exception as exc:  # noqa: BLE001
+            check("导出含「号码后8位」列", False, str(exc))
 
         # 6) 详情面板 + 手工校正 + 重新解析
         if records:

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional
 
@@ -40,8 +41,17 @@ class InvoiceRecord:
     manual: bool = False      # 是否被手工修改过
     selected: bool = False    # 是否勾选（用于“仅导出选中项”）
 
+    # ---------------- 派生字段 ----------------
+    @property
+    def number_last8(self) -> str:
+        """发票号码后 8 位（随 number 自动变化，手工改号码也会同步）。"""
+        digits = re.sub(r"\D", "", self.number or "")
+        return digits[-8:] if len(digits) >= 8 else ""
+
     # ---------------- 导出 ----------------
     def value(self, key: str, formatted: bool = True) -> Any:
+        if key == "number_last8":
+            return self.number_last8
         value = getattr(self, key, "")
         if key in config.MONEY_FIELDS:
             if formatted:
@@ -69,6 +79,8 @@ class InvoiceRecord:
                 row[label] = getattr(self, key, None)
             elif key == "confidence":
                 row[label] = round(float(self.confidence or 0), 3)
+            elif key == "number_last8":
+                row[label] = self.number_last8
             else:
                 row[label] = getattr(self, key, "")
         return row

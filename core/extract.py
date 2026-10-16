@@ -263,6 +263,12 @@ def is_railway_invoice(text: str) -> bool:
     )
 
 
+def last8(number: str) -> str:
+    """取发票号码的后 8 位（用于和台账 / 报销单核对）。"""
+    digits = re.sub(r"\D", "", number or "")
+    return digits[-8:] if len(digits) >= 8 else ""
+
+
 def extract_buyer(ctx: ParseContext) -> Tuple[str, float]:
     match = re.search(BUYER_SECTION, ctx.text)
     if match:

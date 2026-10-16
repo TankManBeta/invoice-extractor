@@ -52,6 +52,7 @@ STATUS_TEXT = {
 # --------------------------------------------------------------------------
 FIELDS: List[Tuple[str, str, int, bool]] = [
     ("number", "发票号码", 165, False),
+    ("number_last8", "号码后8位", 110, False),
     ("code", "发票代码", 130, False),
     ("date", "开票日期", 105, False),
     ("amount", "金额(不含税)", 110, True),
@@ -65,11 +66,16 @@ FIELDS: List[Tuple[str, str, int, bool]] = [
 ]
 FIELD_LABELS: Dict[str, str] = {k: label for k, label, _w, _r in FIELDS}
 FIELD_KEYS: List[str] = [k for k, _l, _w, _r in FIELDS]
-DEFAULT_VISIBLE_FIELDS: List[str] = [k for k in FIELD_KEYS if k != "page"]
+# 派生字段：由其它字段算出，不能直接赋值（例如"号码后8位"取自发票号码）
+DERIVED_FIELDS: List[str] = ["number_last8"]
+STORED_FIELD_KEYS: List[str] = [k for k in FIELD_KEYS if k not in DERIVED_FIELDS]
+# "号码后8位"与"页码"默认不显示（可在"显示字段"里勾上）
+DEFAULT_VISIBLE_FIELDS: List[str] = [k for k in FIELD_KEYS if k not in ("number_last8", "page")]
 
 # 导出时可用的列（键 -> 中文表头）
 EXPORT_COLUMNS: List[Tuple[str, str]] = [
     ("number", "发票号码"),
+    ("number_last8", "号码后8位"),
     ("code", "发票代码"),
     ("date", "开票日期"),
     ("amount", "金额(不含税)"),
@@ -101,6 +107,7 @@ NUMBER_LENGTHS = (8, 10, 12, 20)
 def build_header_aliases() -> Dict[str, List[str]]:
     aliases = {
         "number": ["发票号码", "发票号", "号码", "票号", "invoice number", "invoice_no", "number", "no"],
+        "number_last8": ["号码后8位", "后8位", "发票号码后8位", "末8位"],
         "code": ["发票代码", "代码", "invoice code", "code"],
         "date": ["开票日期", "日期", "date", "issue date"],
         "amount": ["金额", "金额(不含税)", "不含税金额", "合计金额", "amount", "net"],

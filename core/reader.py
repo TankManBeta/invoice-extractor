@@ -78,6 +78,8 @@ def rows_to_records(
         for column, key in mapping.items():
             if column >= len(row):
                 continue
+            if key == "number_last8":
+                continue  # 派生字段（由发票号码算出），不直接写入
             raw = row[column]
             if key in config.MONEY_FIELDS:
                 setattr(record, key, to_float(_cell_to_text(raw)))

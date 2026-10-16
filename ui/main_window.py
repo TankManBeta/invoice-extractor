@@ -486,7 +486,7 @@ class MainWindow(QtWidgets.QMainWindow):
             options=self.options,
             already_normalized=True,
         )
-        for field in config.FIELD_KEYS:
+        for field in config.STORED_FIELD_KEYS:
             if field in ("source", "page", "confidence"):
                 continue
             setattr(record, field, getattr(fresh, field, getattr(record, field)))
